@@ -1,0 +1,18 @@
+name: Test And Create Coverage
+on:
+  push:
+    branches: [ mainline ]
+  workflow_dispatch:
+jobs:
+  test-and-coverage:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.21.1
+    - name: Test Go
+      run: go test -v --cover ./...
+    - name: Update coverage badge
+      uses: ncruces/go-coverage-report@v0

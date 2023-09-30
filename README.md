@@ -1,4 +1,5 @@
 # Monkey Party
+[![Go Coverage](https://github.com/Techypanda/Monkey-Party/wiki/coverage.svg)](https://raw.githack.com/wiki/Techypanda/Monkey-Party/coverage.html)
 
 ## Testing
 ```
