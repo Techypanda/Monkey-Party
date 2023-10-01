@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"techytechster.com/monkeyparty/pkg"
 	"techytechster.com/monkeyparty/pkg/rooms_grpc"
 )
 
@@ -27,6 +28,32 @@ func TestCanCreateAndJoinRoom(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no err for joining room: %s", err.Error())
 	}
+}
+
+type MockRoom struct {
+	pkg.Roomiface
+}
+
+func (m MockRoom) IsStillValid() bool {
+	return false
+}
+
+func TestBackgroundRoomChecker(t *testing.T) {
+	initialize()
+	service := &RoomGRPCService{
+		rooms: map[string]*pkg.Roomiface{},
+	}
+	_, err := service.CreateRoom(context.TODO(), &rooms_grpc.CreateRoomRequest{})
+	if err != nil {
+		t.Fatalf("failed to create room: %s", err.Error())
+	}
+	var v pkg.Roomiface = MockRoom{}
+	service.rooms["asdf"] = &v
+	service.backgroundRoomChecker()
+	getUnixNow = func() int64 {
+		return timeNow().AddDate(0, 0, 1).Unix()
+	}
+	service.backgroundRoomChecker()
 }
 
 func TestCannotJoinNonExistingRooms(t *testing.T) {

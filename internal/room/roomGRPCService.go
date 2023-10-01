@@ -30,10 +30,7 @@ var errFailedToGenerateRoom = errors.New("failed to generate a room")
 
 func (r *RoomGRPCService) CreateRoom(context context.Context, payload *rooms_grpc.CreateRoomRequest) (*rooms_grpc.CreatedRoomResponse, error) {
 	log.Info().Msg("Creating a new room")
-	if payload.RoomName != nil { // TODO: rework room.go to allow name
-		log.Warn().Msg("Currently not supported: naming of rooms manually - automatic naming done via funName")
-	}
-	room, err := New(payload.Passphrase)
+	room, err := New(payload.RoomName, payload.Passphrase)
 	if err != nil {
 		log.Err(err).Msg("failed to create a room")
 		return nil, errFailedToGenerateRoom
@@ -45,10 +42,23 @@ func (r *RoomGRPCService) CreateRoom(context context.Context, payload *rooms_grp
 	}, nil
 }
 
+func (r *RoomGRPCService) backgroundRoomChecker() {
+	log.Info().Msg("doing a scan of all current rooms and checking if they are all valid")
+	for key, value := range r.rooms {
+		log.Info().Interface("room", value)
+		if !(*value).IsStillValid() {
+			log.Info().Str("room", key).Msg("room is no longer valid, deleting")
+			delete(r.rooms, key)
+		}
+	}
+}
+
 func NewGRPC() rooms_grpc.RoomsServer {
-	return &RoomGRPCService{
+	newGrpcServer := &RoomGRPCService{
 		rooms: map[string]*pkg.Roomiface{},
 	}
+	go newGrpcServer.backgroundRoomChecker()
+	return newGrpcServer
 }
 
 // Theres going to need to be background thread to check rooms are still active

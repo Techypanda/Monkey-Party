@@ -13,7 +13,7 @@ func initialize() {
 
 func TestCanJoinRoom(t *testing.T) {
 	initialize()
-	r, err := New(nil)
+	r, err := New(nil, nil)
 	if err != nil {
 		t.Fatalf("expected no err for creating room: %s", err.Error())
 	}
@@ -22,7 +22,7 @@ func TestCanJoinRoom(t *testing.T) {
 		t.Fatalf("expected no err for joining room: %s", err.Error())
 	}
 	mockPassword := "ThisIsASecurePassword"
-	r, err = New(&mockPassword)
+	r, err = New(nil, &mockPassword)
 	if err != nil {
 		t.Fatalf("expected no err for creating room with password: %s", err.Error())
 	}
@@ -48,7 +48,7 @@ func TestCryptoFailures(t *testing.T) {
 		return 0, errors.New("mock error")
 	}
 	mockPassword := "ThisIsASecurePassword"
-	_, err := New(&mockPassword)
+	_, err := New(nil, &mockPassword)
 	if !errors.Is(err, errFailedToCreateRoom) {
 		t.Fatalf("expected err to be errFailedToCreateRoom: %s", err.Error())
 	}

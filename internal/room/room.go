@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"time"
 
 	"golang.org/x/crypto/argon2"
 	"techytechster.com/monkeyparty/pkg"
@@ -13,17 +14,34 @@ import (
 
 type Room struct {
 	Roomname      string
+	nextCheck     int64
 	passphrase    []byte
 	encryptionKey []byte
 }
 
-func (r Room) Join(password *string) error {
+var timeNow = time.Now
+var getUnixNow = func() int64 {
+	return timeNow().Unix()
+}
+
+func (r *Room) roomContainsActivePlayers() bool {
+	r.nextCheck = timeNow().Add(time.Minute * time.Duration(timeToCheckMinutesPeriod)).Unix()
+	return true
+}
+func (r *Room) IsStillValid() bool {
+	now := getUnixNow()
+	if r.nextCheck < now {
+		return r.roomContainsActivePlayers()
+	}
+	return true
+}
+func (r *Room) Join(password *string) error {
 	if r.passphrase != nil {
 		return checkPasswordIsCorrect(password, r.passphrase, r.encryptionKey)
 	}
 	return nil
 }
-func (r Room) Name() string {
+func (r *Room) Name() string {
 	return r.Roomname
 }
 
@@ -52,15 +70,16 @@ func generateRandomBytes(n uint32) ([]byte, error) {
 var errNoPasswordProvided = errors.New("expected a password, none was provided")
 var errIncorrectPassword = errors.New("the room password provided is incorrect")
 var encryptionMemoryKIB uint32 = 65536
-var threads uint8 = 2
-var keyLen uint32 = 32
-var time uint32 = 3
+
+const threads uint8 = 2
+const keyLen uint32 = 32
+const timeConstant uint32 = 3
 
 func checkPasswordIsCorrect(password *string, targetHash []byte, salt []byte) error {
 	if password == nil {
 		return errNoPasswordProvided
 	}
-	hash := argon2.IDKey([]byte(*password), salt, time, encryptionMemoryKIB, threads, keyLen)
+	hash := argon2.IDKey([]byte(*password), salt, timeConstant, encryptionMemoryKIB, threads, keyLen)
 	if !bytes.Equal(hash, targetHash) {
 		return errIncorrectPassword
 	}
@@ -74,25 +93,34 @@ func generateFromPassword(password string) (b64hash []byte, b64salt []byte, err 
 	if err != nil {
 		return nil, nil, errors.Join(errFailedToGenerateSalt, err)
 	}
-	hash := argon2.IDKey([]byte(password), salt, time, encryptionMemoryKIB, threads, keyLen)
+	hash := argon2.IDKey([]byte(password), salt, timeConstant, encryptionMemoryKIB, threads, keyLen)
 	return hash, salt, nil
 }
 
 var errFailedToCreateRoom = errors.New("failed to generate new room")
 
-func New(passphrase *string) (pkg.Roomiface, error) {
+const timeToCheckMinutesPeriod = 2
+
+func New(roomName *string, passphrase *string) (pkg.Roomiface, error) {
+	name := roomName
+	if roomName == nil {
+		genName := funName()
+		name = &genName
+	}
 	if passphrase != nil {
 		hash, salt, err := generateFromPassword(*passphrase)
 		if err != nil {
 			return nil, errors.Join(errFailedToCreateRoom, err)
 		}
 		return &Room{
-			Roomname:      funName(),
+			Roomname:      *name,
 			passphrase:    hash,
 			encryptionKey: salt,
+			nextCheck:     timeNow().Add(time.Minute * time.Duration(timeToCheckMinutesPeriod)).Unix(),
 		}, nil
 	}
 	return &Room{
-		Roomname: funName(),
+		Roomname:  *name,
+		nextCheck: timeNow().Add(time.Minute * time.Duration(timeToCheckMinutesPeriod)).Unix(),
 	}, nil
 }
