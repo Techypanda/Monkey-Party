@@ -23,6 +23,9 @@ func (r Room) Join(password *string) error {
 	}
 	return nil
 }
+func (r Room) Name() string {
+	return r.Roomname
+}
 
 var POSSIBLE_NAMES = []string{"Red", "Green", "Blue", "Yellow", "Rabbit", "Pig", "Tortise", "Yahoo", "Google", "Bing", "Meta", "Amazon"}
 

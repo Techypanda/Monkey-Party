@@ -1,12 +1,18 @@
 package room
 
 import (
+	cryptoRand "crypto/rand"
 	"errors"
 	"strings"
 	"testing"
 )
 
+func initialize() {
+	cryptoRead = cryptoRand.Read
+}
+
 func TestCanJoinRoom(t *testing.T) {
+	initialize()
 	r, err := New(nil)
 	if err != nil {
 		t.Fatalf("expected no err for creating room: %s", err.Error())
@@ -37,6 +43,7 @@ func TestCanJoinRoom(t *testing.T) {
 }
 
 func TestCryptoFailures(t *testing.T) {
+	initialize()
 	cryptoRead = func(b []byte) (n int, err error) {
 		return 0, errors.New("mock error")
 	}

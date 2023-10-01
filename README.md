@@ -1,6 +1,9 @@
 # Monkey Party
 [![Go Coverage](https://github.com/Techypanda/Monkey-Party/wiki/coverage.svg)](https://raw.githack.com/wiki/Techypanda/Monkey-Party/coverage.html)
 
+## Quick Note On Coverprofile
+This package has not setup coverage correctly so for now we manually commit in the coverprofile
+
 ## Contents
 - [How To Test This Project](#testing)
 - [Roomagent](#roomagent)

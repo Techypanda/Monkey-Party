@@ -4,11 +4,19 @@ package rooms;
 
 service Rooms {
     rpc JoinRoom(JoinRoomRequest) returns (JoinRoomResponse) {}
+    rpc CreateRoom(CreateRoomRequest) returns (CreatedRoomResponse) {}
 }
 
 message JoinRoomRequest {
     string roomName = 1;
     optional string passphrase = 2;
 }
-message JoinRoomResponse { // Unsure if I need fields yet
+message JoinRoomResponse {
+}
+message CreateRoomRequest {
+    optional string roomName = 1;
+    optional string passphrase = 2;
+}
+message CreatedRoomResponse {
+    string roomName = 1;
 }

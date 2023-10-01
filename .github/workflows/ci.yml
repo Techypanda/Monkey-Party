@@ -13,6 +13,13 @@ jobs:
       with:
         go-version: 1.21.1
     - name: Test Go
-      run: go test -v --cover ./...
+      run: go test -v ./... -cover
+    - name: Validate Go Coverage Is 100%
+      run: ./test-coverage.sh
+    - name: TODO somehow pass correct coverprofile to next step
+      run: echo 'TODO'
     - name: Update coverage badge
       uses: ncruces/go-coverage-report@v0
+      with:
+        context: .
+        coverage-file: coverprofile

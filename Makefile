@@ -4,7 +4,7 @@ compile-grpc: # Compiles GRPC
 	protoc --go_out=pkg/rooms_grpc/ --go_opt=paths=source_relative --go-grpc_out=pkg/rooms_grpc/ --go-grpc_opt=paths=source_relative rooms.proto
 
 test: # TODO
-	go test -v -count=1 --cover ./...
+	go test -v ./... -coverprofile coverprofile
 
 roomagent:
 	go run cmd/roomagent/main.go
