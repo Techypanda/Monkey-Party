@@ -1,11 +1,8 @@
 package main
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"flag"
 	"fmt"
-	"math"
 	"net"
 
 	"github.com/cockroachdb/redact"
@@ -14,17 +11,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"techytechster.com/monkeyparty/internal/room"
+	"techytechster.com/monkeyparty/internal/utils"
 	"techytechster.com/monkeyparty/pkg/rooms_grpc"
 )
 
 const SECRET_LENGTH = 4128
-
-func randomBase64String(l int) string {
-	buff := make([]byte, int(math.Ceil(float64(l)/float64(1.33333333333))))
-	rand.Read(buff)
-	str := base64.RawURLEncoding.EncodeToString(buff)
-	return str[:l] // strip 1 extra character we get from odd length results
-}
 
 const DEFAULT_ROOM_PORT uint = 8054
 
@@ -59,7 +50,8 @@ func main() {
 		fatalLog.Err(err).Uint("port", *port).Msg("failed to listen on port") // Return is only needed for unit tests
 		return
 	}
-	secretKey := randomBase64String(SECRET_LENGTH)
+	// TODO: Probably swap for a certificate or two part key (API holds one key RoomAgent holds second)
+	secretKey := utils.RandomBase64String(SECRET_LENGTH)
 	secretKeyRedacted := redact.Sprintf("generated secretkey: %s", secretKey)
 	secretKeyRedacted.StripMarkers()
 	log.Info().Msg(string(secretKeyRedacted.Redact()))

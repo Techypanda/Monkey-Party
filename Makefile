@@ -9,6 +9,9 @@ test: # TODO
 roomagent:
 	go run cmd/roomagent/main.go
 
+monkeypartyapi:
+	go run cmd/monkeypartyapi/main.go
+
 grpc-gui: # Uses https://github.com/fullstorydev/grpcui to give you a gui for roomagent
 	grpcui -plaintext localhost:8054
 

@@ -1,10 +1,20 @@
 mode: set
-techytechster.com/monkeyparty/cmd/roomagent/main.go:22.39,27.2 4 1
-techytechster.com/monkeyparty/cmd/roomagent/main.go:35.41,39.2 3 1
-techytechster.com/monkeyparty/cmd/roomagent/main.go:52.13,58.16 5 1
-techytechster.com/monkeyparty/cmd/roomagent/main.go:58.16,61.3 2 1
-techytechster.com/monkeyparty/cmd/roomagent/main.go:62.2,70.45 9 1
-techytechster.com/monkeyparty/cmd/roomagent/main.go:70.45,73.3 2 1
+techytechster.com/monkeyparty/cmd/monkeypartyapi/main.go:21.76,28.2 3 1
+techytechster.com/monkeyparty/cmd/monkeypartyapi/main.go:34.60,37.2 2 1
+techytechster.com/monkeyparty/cmd/monkeypartyapi/main.go:38.62,40.2 1 1
+techytechster.com/monkeyparty/cmd/monkeypartyapi/main.go:41.80,43.2 1 1
+techytechster.com/monkeyparty/cmd/monkeypartyapi/main.go:45.13,66.2 8 1
+techytechster.com/monkeyparty/internal/handlers/ping/ping.go:9.33,13.2 1 1
+techytechster.com/monkeyparty/cmd/roomagent/main.go:26.41,30.2 3 1
+techytechster.com/monkeyparty/cmd/roomagent/main.go:43.13,49.16 5 1
+techytechster.com/monkeyparty/cmd/roomagent/main.go:49.16,52.3 2 1
+techytechster.com/monkeyparty/cmd/roomagent/main.go:54.2,62.45 9 1
+techytechster.com/monkeyparty/cmd/roomagent/main.go:62.45,65.3 2 1
+techytechster.com/monkeyparty/internal/handlers/session/session.go:14.43,25.2 5 1
+techytechster.com/monkeyparty/internal/handlers/whoami/whoami.go:13.35,21.52 3 1
+techytechster.com/monkeyparty/internal/handlers/whoami/whoami.go:21.52,25.3 1 1
+techytechster.com/monkeyparty/internal/handlers/whoami/whoami.go:26.2,28.4 1 1
+techytechster.com/monkeyparty/internal/router/router.go:16.27,20.2 3 1
 techytechster.com/monkeyparty/internal/room/room.go:23.31,25.2 1 1
 techytechster.com/monkeyparty/internal/room/room.go:27.49,30.2 2 1
 techytechster.com/monkeyparty/internal/room/room.go:31.36,33.23 2 1
