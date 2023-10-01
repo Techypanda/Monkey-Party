@@ -1,0 +1,14 @@
+syntax = "proto3";
+option go_package = "techytechster.com/monkeyparty/pkg/rooms_grpc";
+package rooms;
+
+service Rooms {
+    rpc JoinRoom(JoinRoomRequest) returns (JoinRoomResponse) {}
+}
+
+message JoinRoomRequest {
+    string roomName = 1;
+    optional string passphrase = 2;
+}
+message JoinRoomResponse { // Unsure if I need fields yet
+}

@@ -3,13 +3,18 @@ package main
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"flag"
+	"fmt"
 	"math"
+	"net"
 
 	"github.com/cockroachdb/redact"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"techytechster.com/monkeyparty/internal/room"
-	"techytechster.com/monkeyparty/pkg"
+	"techytechster.com/monkeyparty/pkg/rooms_grpc"
 )
 
 const SECRET_LENGTH = 4128
@@ -21,28 +26,49 @@ func randomBase64String(l int) string {
 	return str[:l] // strip 1 extra character we get from odd length results
 }
 
-var rooms []pkg.Roomiface = []pkg.Roomiface{}
+const DEFAULT_ROOM_PORT uint = 8054
 
-func addRoom(password *string) error {
-	newRoom, err := room.New(password)
-	if err != nil {
-		log.Err(err).Msg("failed to create ")
-	}
-	rooms = append(rooms, newRoom)
-	return nil
+var flagParse = flag.Parse
+var flagUint = flag.Uint
+var netListen = net.Listen
+var fatalLog = log.Fatal()
+var newGRPCServer = func() *grpc.Server {
+	var opts []grpc.ServerOption
+	grpcServer := grpc.NewServer(opts...)
+	return grpcServer
 }
 
 /*
 Roomagent handles joining, creating and performing room operations for Monkey party.
 
 This is done through a variety of operations available through roomagent via socket.
+
+Flags:
+-port {Port_Number} uint: The port to run the grpc service on (Default - DEFAULT_ROOM_PORT=8054)
+
+Usage:
+-h: display help
 */
 func main() {
+	port := flagUint("port", DEFAULT_ROOM_PORT, "set the port to run grpc service on")
+	flagParse()
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	// Start The Server
+	lis, err := netListen("tcp", fmt.Sprintf("localhost:%d", *port))
+	if err != nil {
+		fatalLog.Err(err).Uint("port", *port).Msg("failed to listen on port") // Return is only needed for unit tests
+		return
+	}
 	secretKey := randomBase64String(SECRET_LENGTH)
-	secretKeyRedacted := redact.Sprintf("started roomagent, secretkey: %s", secretKey)
+	secretKeyRedacted := redact.Sprintf("generated secretkey: %s", secretKey)
 	secretKeyRedacted.StripMarkers()
 	log.Info().Msg(string(secretKeyRedacted.Redact()))
-	var mockPsw = "thisIsAPassword"
-	addRoom(&mockPsw)
+	grpcServer := newGRPCServer()
+	rooms_grpc.RegisterRoomsServer(grpcServer, room.NewGRPC())
+	log.Info().Uint("port", *port).Msg("Started GRPC Service")
+	reflection.Register(grpcServer)
+	if err = grpcServer.Serve(lis); err != nil {
+		fatalLog.Err(err).Uint("port", *port).Msg("failed to serve grpc service") // Return is only needed for unit tests
+		return
+	}
 }

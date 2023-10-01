@@ -30,3 +30,8 @@ make roomagent
 ```sh
 make test-roomagent
 ```
+
+#### Local Manual Testing
+```sh
+make grpc-gui
+```
